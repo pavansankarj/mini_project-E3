@@ -125,7 +125,8 @@ def recognizing_one_face():
     video_capture_object.release()  #releasing video capture object
     cv2.destroyAllWindows()     #destroying all windows opened by opencv module i.e., cv2
     if var==True:
-        check_0(recognized_images[0])
+        # check_0(recognized_images[0])
+        fetch(recognized_images[0])
     else:
         time_out()
 
@@ -174,31 +175,47 @@ def time_out():
     CTkButton(top_level_4, text="Exit", command=sys.exit).pack(pady=20)
     top_level_4.mainloop()
 def direct_login(id, passwd):
-    options = webdriver.ChromeOptions() #to set options
-    options.add_experimental_option("detach",True)  #setting chrome option to detatch opened browser window from program, so that browser won't be closed even if we exit the program
-    browser = webdriver.Chrome(options = options)
-    browser.maximize_window()   #to maximize browser window to full screen
+    if os.path.isfile("chromedriver.exe") == False:
+        tkinter.messagebox.showerror('NO_DRIVER','please place chrome driver in path i.e., in the same location of python script')
+        sys.exit()
     try:
-        browser.get("https://intranet.rguktn.ac.in/SMS/")   #opening browser to this url
-        browser.implicitly_wait(10)     #maximum time to wait to identify each element in browser
-        user_name = browser.find_element(by="id",value="user1")     #finding elements
-        password = browser.find_element(by="id",value="passwd1")
-        user_name.send_keys(id)     #sending keys
+        options = webdriver.ChromeOptions()  # to set options
+        options.add_experimental_option("detach",True)  # setting chrome option to detatch opened browser window from program, so that browser won't be closed even if we exit the program
+        browser = webdriver.Chrome(options=options)
+        browser.maximize_window()
+        browser.get("https://intranet.rguktn.ac.in/SMS/")  # opening browser to this url
+        browser.implicitly_wait(10)  # maximum time to wait to identify each element in browser
+        user_name = browser.find_element(by="id", value="user1")  # finding elements
+        password = browser.find_element(by="id", value="passwd1")
+        user_name.send_keys(id)  # sending keys
         password.send_keys(passwd)
-        password.submit()       #clicking on submit
+        password.submit()  # clicking on submit
         sys.exit()
     except Exception:
-        browser.quit()  #closing the browser and also it's sessions
-        top_level_7 = CTkToplevel()
-        top_level_7.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_7))
-        top_level_7.title('LOGIN ISSUE')
-        def exception_dl_result():
-            top_level_7.destroy()
-            direct_login(id, passwd)
-        CTkLabel(top_level_7,text="Some error occured\n\n Check your internet connection then click on Retry\n\n To exit the program click on Exit").pack(padx=20,pady=20)
-        CTkButton(top_level_7,text='Retry',command=exception_dl_result).pack()
-        CTkButton(top_level_7, text='Exit', command=sys.exit).pack(pady=20)
-        top_level_7.mainloop()
+        try:
+            title_browser = browser.title   #checking whether is opened or closed
+            browser.quit()  #closing the browser and also it's sessions
+            top_level_7 = CTkToplevel()
+            top_level_7.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_7))
+            top_level_7.title('LOGIN ISSUE')
+            def exception_dl_result_1():
+                top_level_7.destroy()
+                direct_login(id, passwd)
+            CTkLabel(top_level_7,text="Some error occured\n\n Check your internet connection then click on Retry\n\n To exit the program click on Exit").pack(padx=20,pady=20)
+            CTkButton(top_level_7,text='Retry',command=exception_dl_result_1).pack()
+            CTkButton(top_level_7, text='Exit', command=sys.exit).pack(pady=20)
+            top_level_7.mainloop()
+        except Exception:
+            top_level_9 = CTkToplevel()
+            top_level_9.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_9))
+            top_level_9.title('LOGIN ISSUE')
+            def exception_dl_result_2():
+                top_level_9.destroy()
+                direct_login(id, passwd)
+            CTkLabel(top_level_9,text="Browser closed\n\n click on retry to again retry\n\n To exit the program click on Exit").pack(padx=20, pady=20)
+            CTkButton(top_level_9, text='Retry', command=exception_dl_result_2).pack()
+            CTkButton(top_level_9, text='Exit', command=sys.exit).pack(pady=20)
+            top_level_9.mainloop()
 def retry():
     top_level_2 = CTkToplevel()
     top_level_2.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_2))
@@ -272,21 +289,21 @@ def show_option_to_login(recognized_images):
     CTkButton(top_level_5, text="submit",command=show_option_to_login_result).pack(pady=20,padx=60)
     top_level_5.mainloop()
 
-def check_0(id):
-    def check_0_result_1():
-        top_level_3.destroy()
-        fetch(id)
-    def check_0_result_2():
-        top_level_3.destroy()
-        recognized_images.clear()
-        recognizing_one_face()
-    top_level_3 = CTkToplevel()
-    top_level_3.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_3))
-    top_level_3.title("RECOGNIZED")
-    CTkButton(top_level_3,text="Log_to_"+id,command=check_0_result_1).pack(pady=20,padx=60)
-    CTkButton(top_level_3, text="Retry", command=check_0_result_2).pack()
-    CTkButton(top_level_3, text="exit_program", command=sys.exit).pack(pady=20)
-    top_level_3.mainloop()
+# def check_0(id):
+#     def check_0_result_1():
+#         top_level_3.destroy()
+#         fetch(id)
+#     def check_0_result_2():
+#         top_level_3.destroy()
+#         recognized_images.clear()
+#         recognizing_one_face()
+#     top_level_3 = CTkToplevel()
+#     top_level_3.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_3))
+#     top_level_3.title("RECOGNIZED")
+#     CTkButton(top_level_3,text="Log_to_"+id,command=check_0_result_1).pack(pady=20,padx=60)
+#     CTkButton(top_level_3, text="Retry", command=check_0_result_2).pack()
+#     CTkButton(top_level_3, text="exit_program", command=sys.exit).pack(pady=20)
+#     top_level_3.mainloop()
 def decrypt_password(encrypted_password):
     password = fernet.decrypt(encrypted_password).decode()      #decrypt password
     return password
@@ -309,21 +326,20 @@ def check_1():
 if __name__  == '__main__':
     def mongo_connection():
         try:
-            print("try")
             # #for localhost connection to fetch data stored in local mongodb
-            # client = MongoClient("mongodb://localhost:27017")
-            # db = client["sms_login_details"]
-            # collection = db["sms_login_details_n18"]
-            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
-            mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
-            db = mongo_atlas["sms_login_details"]
+            client = MongoClient("mongodb://localhost:27017")
+            db = client["sms_login_details"]
+            global collection
             collection = db["sms_login_details_n18"]
+            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
+            # mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
+            # db = mongo_atlas["sms_login_details"]
+            # global collection
+            # collection = db["sms_login_details_n18"]
             n18_encodings = collection.find({}, {"_id": 0, "face_encoding": 1})  # Assume as it returns a list of dictionaries which only has 'face_encoding' as a key and it's encoding as a value. But in general n18_encodings is a cursor object which has dictionaries of our face encodings
             global  encodings_n18
             encodings_n18 = [i['face_encoding'] for i in n18_encodings]  # It only has encodings stored in a list
-            raise Exception
         except:
-            print("except")
             top_level_9 = CTkToplevel()
             top_level_9.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_9))
             top_level_9.title('CONNECTION ISSSUE')
