@@ -129,12 +129,12 @@ def recognizing_one_face():
             if True in matched:
                 recognized_images.append('N'+str(180001+matched.index(True)))   #appending identified images
                 name = recognized_images[0]
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (255, 255, 255),2)
+                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (0, 0, 0),2)
                 var = True
                 break
             else:
                 # cv2.rectangle(frame, (left, top), (right, bottom), (255, 0, 0), 2)    #to draw rectangle over detected face
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(255, 255, 255), 2)  #showing name at position 50 px down from top and 50px right from left end
+                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(0, 0, 0), 2)  #showing name at position 50 px down from top and 50px right from left end
         cv2.imshow("RECOGNIZING", frame)
         if cv2.waitKey(1) == 32:    # waitkey returns ASCII value of pressed key and also wait for 1 millisecond for input i.e., to stop showing videocapturing when user clicked on "space bar"(32 is ASCII value of space bar)
             break
@@ -169,11 +169,11 @@ def recognizing_faces():
             if True in matched:
                 IDs_matched = ['N'+str(id+i) for i, match in enumerate(matched) if match]
                 for i in IDs_matched:
-                    cv2.putText(frame, i, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (255, 255, 255),2)
+                    cv2.putText(frame, i, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (0, 0, 0),2)
                     if i not in recognized_images:
                         recognized_images.append(i)
             else:
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(255, 255, 255), 2)
+                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(0, 0, 0), 2)
         cv2.imshow("RECOGNIZING", frame)
         if cv2.waitKey(1) == 32:
             break
