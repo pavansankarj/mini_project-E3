@@ -6,6 +6,8 @@
 
 4) Type ---> py -3.10 pip install -r requirements.txt --> command to install all necessary modules
 
+5) Download chromedriver from website https://chromedriver.chromium.org/downloads - chromedriver version should be specific to your chrome browser. Download chromedriver specific to your operating system 
+
 5) Now you can run recognize.py file for face_recognition task. To run using command prompt --> py -3.10 recognize.py
 
 Note: Make sure that your command prompt is in the current folder only i.e., in "mini_project-E3"(which you have downloaded or cloned from github) only
