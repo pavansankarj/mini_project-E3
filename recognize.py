@@ -1,5 +1,6 @@
 # to exit from program
 import sys
+import os
 
 #To generate key and perform password encryption and decryption
 from cryptography.fernet import Fernet
