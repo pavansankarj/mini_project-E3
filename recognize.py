@@ -331,16 +331,16 @@ if __name__  == '__main__':
     def mongo_connection():
         try:
             # #for localhost connection to fetch data stored in local mongodb
-            client = MongoClient("mongodb://localhost:27017")
-            db = client["sms_login_details"]
-            global collection
-            collection = db["sms_login_details_n18"]
-
-            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
-            # mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
-            # db = mongo_atlas["sms_login_details"]
+            # client = MongoClient("mongodb://localhost:27017")
+            # db = client["sms_login_details"]
             # global collection
             # collection = db["sms_login_details_n18"]
+
+            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
+            mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
+            db = mongo_atlas["sms_login_details"]
+            global collection
+            collection = db["sms_login_details_n18"]
             n18_encodings = collection.find({}, {"_id": 0, "face_encoding": 1})  # Assume as it returns a list of dictionaries which only has 'face_encoding' as a key and it's encoding as a value. But in general n18_encodings is a cursor object which has dictionaries of our face encodings
             global encodings_n18
             encodings_n18 = [i['face_encoding'] for i in n18_encodings]  # It only has encodings stored in a list
