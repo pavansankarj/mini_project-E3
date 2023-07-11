@@ -185,7 +185,7 @@ def direct_login(id, passwd):
         browser = webdriver.Chrome(options=options)
         browser.maximize_window()
         browser.get("https://intranet.rguktn.ac.in/SMS/")  # opening browser to this url
-        browser.implicitly_wait(10)  # maximum time to wait to identify each element in browser
+        browser.implicitly_wait(30)  # maximum time to wait to identify each element in browser
         user_name = browser.find_element(by="id", value="user1")  # finding elements
         password = browser.find_element(by="id", value="passwd1")
         user_name.send_keys(id)  # sending keys
@@ -232,7 +232,8 @@ def retry():
 #function to verify random_top generated and user inputted otp
 def enter_otp(id,random_otp):
     def verify_otp_result():
-        if otp_data.get() == str(random_otp):
+        if otp_data_var.get() == str(random_otp):
+            print("verify_otp_result")
             top_level_6.destroy()
             fetch(id)
         else:
@@ -241,7 +242,8 @@ def enter_otp(id,random_otp):
     top_level_6.protocol("WM_DELETE_WINDOW", lambda : exit_program(top_level_6))
     top_level_6.title("VERIFY")
     otp_info = CTkLabel(top_level_6, text='\nEnter OTP sent to mail for confirmation of your login').pack(padx=20)
-    otp_data = CTkEntry(top_level_6, placeholder_text='Enter OTP').pack(padx=40,pady=20)
+    otp_data_var = StringVar()
+    otp_data = CTkEntry(top_level_6, textvariable=otp_data_var).pack(padx=40,pady=20)
     ok_otp = CTkButton(top_level_6, text='VERIFY', command=verify_otp_result).pack(padx=40)
     CTkButton(top_level_6, text='EXIT', command=sys.exit).pack(padx=40,pady=20)
     top_level_6.mainloop()
@@ -325,19 +327,20 @@ def check_1():
         retry()
 
 if __name__  == '__main__':
+    # enter_otp("N180109",1818)
     def mongo_connection():
         try:
             # #for localhost connection to fetch data stored in local mongodb
-            # client = MongoClient("mongodb://localhost:27017")
-            # db = client["sms_login_details"]
-            # global collection
-            # collection = db["sms_login_details_n18"]
-
-            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
-            mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
-            db = mongo_atlas["sms_login_details"]
+            client = MongoClient("mongodb://localhost:27017")
+            db = client["sms_login_details"]
             global collection
             collection = db["sms_login_details_n18"]
+
+            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
+            # mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
+            # db = mongo_atlas["sms_login_details"]
+            # global collection
+            # collection = db["sms_login_details_n18"]
             n18_encodings = collection.find({}, {"_id": 0, "face_encoding": 1})  # Assume as it returns a list of dictionaries which only has 'face_encoding' as a key and it's encoding as a value. But in general n18_encodings is a cursor object which has dictionaries of our face encodings
             global encodings_n18
             encodings_n18 = [i['face_encoding'] for i in n18_encodings]  # It only has encodings stored in a list
