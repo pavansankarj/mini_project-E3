@@ -81,8 +81,8 @@ def which_login():
     def enable_button():
         CTkButton(top_level_1, text="OK", command=which_login_result).grid(pady=20,padx=20,row=2,column=0)
     r1_var = StringVar()
-    r1 = CTkRadioButton(top_level_1,text="one_person_recognize",variable=r1_var,value = "one",command=enable_button).grid(pady=20,padx=40,row=0,column=0)
-    r2 = CTkRadioButton(top_level_1,text="many_persons_recognize",variable=r1_var,value="many",command=enable_button).grid(pady=20,padx=40,row=1,column=0)
+    r1 = CTkRadioButton(top_level_1,text="solo",variable=r1_var,value = "one",command=enable_button).grid(pady=20,padx=80,row=0,column=0)
+    r2 = CTkRadioButton(top_level_1,text="in crowd",variable=r1_var,value="many",command=enable_button).grid(pady=20,padx=80,row=1,column=0)
     button_which_login = CTkButton(top_level_1,text="OK",state=DISABLED).grid(pady=20,padx=20,row=2,column=0)
     top_level_1.mainloop()
 
@@ -104,20 +104,20 @@ def recognizing_one_face():
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  #converting BGR format to RGB format as face_recognition module works with RGB format
         face_loacations_in_frame = face_recognition.face_locations(rgb_frame)   #finding face locations --> returns list of tuples
         face_encodings_in_frame = face_recognition.face_encodings(rgb_frame, face_loacations_in_frame)  #finding face encodings at identified locations -->returns list of arrays(an array of 128 values)
-        # for (top, right, left, bottom), face_encodings_of_frame in zip(face_loacations_in_frame,face_encodings_in_frame):
-        for face_encodings_of_frame in face_encodings_in_frame:
+        for (top, right, left, bottom), face_encodings_of_frame in zip(face_loacations_in_frame,face_encodings_in_frame):
+        # for face_encodings_of_frame in face_encodings_in_frame:
             threshold = 0.4
             matched = face_recognition.compare_faces(encodings_n18, face_encodings_of_frame,threshold)  #comparing encodings of webcam with saved MongoDB data. It gives index of recognized images
             name = "Stranger"
             if True in matched:
                 recognized_images.append('N'+str(180001+matched.index(True)))   #appending identified images
                 name = recognized_images[0]
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (0, 0, 0),2)
+                cv2.putText(frame, name, (left+3,bottom-3), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (255,0,0),2)
                 var = True
                 break
             else:
                 # cv2.rectangle(frame, (left, top), (right, bottom), (255, 0, 0), 2)    #to draw rectangle over detected face
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(0, 0, 0), 2)  #showing name at position 50 px down from top and 50px right from left end
+                cv2.putText(frame, name, (left+3,bottom-3), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(255,0,0), 2)  #showing name at position 50 px down from top and 50px right from left end
         cv2.imshow("RECOGNIZING", frame)
         if cv2.waitKey(1) == 32:    # waitkey returns ASCII value of pressed key and also wait for 1 millisecond for input i.e., to stop showing videocapturing when user clicked on "space bar"(32 is ASCII value of space bar)
             break
@@ -135,7 +135,7 @@ def recognizing_one_face():
 def recognizing_faces():
     id = 180001
     start_time = time.time()
-    duration = 20
+    duration = 120
     video_capture_object = cv2.VideoCapture(0)
     cv2.namedWindow('RECOGNIZING', cv2.WINDOW_NORMAL)
     cv2.setWindowProperty('RECOGNIZING', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
@@ -144,19 +144,19 @@ def recognizing_faces():
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         face_loacations_in_frame = face_recognition.face_locations(rgb_frame)
         face_encodings_in_frame = face_recognition.face_encodings(rgb_frame, face_loacations_in_frame)
-        # for (top, right, left, bottom), face_encodings_of_frame in zip(face_loacations_in_frame,face_encodings_in_frame):
-        for face_encodings_of_frame in face_encodings_in_frame:
+        for (top, right, left, bottom), face_encodings_of_frame in zip(face_loacations_in_frame,face_encodings_in_frame):
+        # for face_encodings_of_frame in face_encodings_in_frame:
             threshold=0.4
             matched = face_recognition.compare_faces(encodings_n18, face_encodings_of_frame,threshold)
             name = "Stranger"
             if True in matched:
                 IDs_matched = ['N'+str(id+i) for i, match in enumerate(matched) if match]
                 for i in IDs_matched:
-                    cv2.putText(frame, i, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (0, 0, 0),2)
+                    cv2.putText(frame, i, (left+3, bottom-3), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (255,0,0),2)
                     if i not in recognized_images:
                         recognized_images.append(i)
             else:
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(0, 0, 0), 2)
+                cv2.putText(frame, name, (left+3,bottom-3), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(255,0,0), 2)
         cv2.imshow("RECOGNIZING", frame)
         if cv2.waitKey(1) == 32:
             break
@@ -331,16 +331,16 @@ if __name__  == '__main__':
     def mongo_connection():
         try:
             # #for localhost connection to fetch data stored in local mongodb
-            # client = MongoClient("mongodb://localhost:27017")
-            # db = client["sms_login_details"]
-            # global collection
-            # collection = db["sms_login_details_n18"]
-
-            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
-            mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
-            db = mongo_atlas["sms_login_details"]
+            client = MongoClient("mongodb://localhost:27017")
+            db = client["sms_login_details"]
             global collection
             collection = db["sms_login_details_n18"]
+
+            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
+            # mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
+            # db = mongo_atlas["sms_login_details"]
+            # global collection
+            # collection = db["sms_login_details_n18"]
             n18_encodings = collection.find({}, {"_id": 0, "face_encoding": 1})  # Assume as it returns a list of dictionaries which only has 'face_encoding' as a key and it's encoding as a value. But in general n18_encodings is a cursor object which has dictionaries of our face encodings
             global encodings_n18
             encodings_n18 = [i['face_encoding'] for i in n18_encodings]  # It only has encodings stored in a list
