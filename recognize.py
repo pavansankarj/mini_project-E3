@@ -135,7 +135,7 @@ def recognizing_one_face():
 def recognizing_faces():
     id = 180001
     start_time = time.time()
-    duration = 120
+    duration = 20
     video_capture_object = cv2.VideoCapture(0)
     cv2.namedWindow('RECOGNIZING', cv2.WINDOW_NORMAL)
     cv2.setWindowProperty('RECOGNIZING', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
@@ -232,16 +232,27 @@ def retry():
 #function to verify random_top generated and user inputted otp
 def enter_otp(id,random_otp):
     def verify_otp_result():
+        top_level_6.destroy()
         if otp_data_var.get() == str(random_otp):
             print("verify_otp_result")
-            top_level_6.destroy()
             fetch(id)
         else:
-            tkinter.messagebox.showerror('Invalid','Invalid OTP')
+            # tkinter.messagebox.showerror('Invalid','Invalid OTP')
+            def re_enter_result():
+                top_level_10.destroy()
+                enter_otp(id, random_otp)
+            top_level_10 = CTkToplevel()
+            top_level_10.title("Incorrect")
+            top_level_10.protocol("WM_DELETE_WINDOW",lambda : exit_program(top_level_10))
+            CTkLabel(top_level_10, text="Incorrect OTP entered").pack(pady=20)
+            verify_otp = CTkButton(top_level_10, text='RE-ENTER', command= re_enter_result).pack(padx=60)
+            CTkButton(top_level_10, text='EXIT', command=sys.exit).pack(pady=20)
+
+
     top_level_6 = CTkToplevel()
     top_level_6.protocol("WM_DELETE_WINDOW", lambda : exit_program(top_level_6))
     top_level_6.title("VERIFY")
-    otp_info = CTkLabel(top_level_6, text='\nEnter OTP sent to mail for confirmation of your login').pack(padx=20)
+    otp_info = CTkLabel(top_level_6, text=f'\nEnter OTP sent to mail({id}) for confirmation of login').pack(padx=20)
     otp_data_var = StringVar()
     otp_data = CTkEntry(top_level_6, textvariable=otp_data_var).pack(padx=40,pady=20)
     ok_otp = CTkButton(top_level_6, text='VERIFY', command=verify_otp_result).pack(padx=40)
@@ -331,16 +342,16 @@ if __name__  == '__main__':
     def mongo_connection():
         try:
             # #for localhost connection to fetch data stored in local mongodb
-            client = MongoClient("mongodb://localhost:27017")
-            db = client["sms_login_details"]
-            global collection
-            collection = db["sms_login_details_n18"]
-
-            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
-            # mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
-            # db = mongo_atlas["sms_login_details"]
+            # client = MongoClient("mongodb://localhost:27017")
+            # db = client["sms_login_details"]
             # global collection
             # collection = db["sms_login_details_n18"]
+
+            # making MongoDB atlas connection to fetch data stored in atlas for face recognition
+            mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
+            db = mongo_atlas["sms_login_details"]
+            global collection
+            collection = db["sms_login_details_n18"]
             n18_encodings = collection.find({}, {"_id": 0, "face_encoding": 1})  # Assume as it returns a list of dictionaries which only has 'face_encoding' as a key and it's encoding as a value. But in general n18_encodings is a cursor object which has dictionaries of our face encodings
             global encodings_n18
             encodings_n18 = [i['face_encoding'] for i in n18_encodings]  # It only has encodings stored in a list
