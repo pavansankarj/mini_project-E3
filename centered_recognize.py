@@ -1,5 +1,6 @@
 # to exit from program
 import sys
+import os
 
 #To generate key and perform password encryption and decryption
 from cryptography.fernet import Fernet
@@ -56,23 +57,25 @@ set_default_color_theme('blue')     #color theme for widgets of dialog boxes
 recognized_images = []      #to store identified images
 encodings_n18 = []  #to store encodings taken from MongoDB
 collection = [] #to store collection of MongoDB
-#function to set toplevel window position
-def set_window_position(top_level):
 
-    #finding window width of toplevels
+
+# function to set toplevel window position
+def set_window_position(top_level):
+    # finding window width of toplevels
     window_width = top_level.winfo_width()
     window_height = top_level.winfo_height()
 
-    #finding screen width and height
+    # finding screen width and height
     screen_width = top_level.winfo_screenwidth()
     screen_height = top_level.winfo_screenheight()
 
-    #finding center at desktop
-    position_x = int((screen_width-window_width)/2)
-    position_y = int((screen_height - window_height)/ 2)
-    top_level.geometry(f"+{position_x}+{position_y}")   #positioning toplevels at center
+    # finding center at desktop
+    position_x = int((screen_width - window_width) / 2)
+    position_y = int((screen_height - window_height) / 2)
+    top_level.geometry(f"+{position_x}+{position_y}")  # positioning toplevels at center
     # top_level.geometry("+500+250")    #directly setting position with numeric values
     top_level.resizable(False, False)  # toplevel not resizable
+
 
 #function which exits user from program when he clicked on top right cancel button in toplevels
 def exit_program(top_level):
@@ -98,8 +101,9 @@ def which_login():
     def enable_button():
         CTkButton(top_level_1, text="OK", command=which_login_result).grid(pady=20,padx=20,row=2,column=0)
     r1_var = StringVar()
-    r1 = CTkRadioButton(top_level_1,text="one_person_recognize",variable=r1_var,value = "one",command=enable_button).grid(pady=20,padx=40,row=0,column=0)
-    r2 = CTkRadioButton(top_level_1,text="many_persons_recognize",variable=r1_var,value="many",command=enable_button).grid(pady=20,padx=40,row=1,column=0)
+
+    r1 = CTkRadioButton(top_level_1,text="solo",variable=r1_var,value = "one",command=enable_button).grid(pady=20,padx=80,row=0,column=0)
+    r2 = CTkRadioButton(top_level_1,text="in crowd",variable=r1_var,value="many",command=enable_button).grid(pady=20,padx=80,row=1,column=0)
     button_which_login = CTkButton(top_level_1,text="OK",state=DISABLED).grid(pady=20,padx=20,row=2,column=0)
     top_level_1.mainloop()
 
@@ -121,20 +125,20 @@ def recognizing_one_face():
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  #converting BGR format to RGB format as face_recognition module works with RGB format
         face_loacations_in_frame = face_recognition.face_locations(rgb_frame)   #finding face locations --> returns list of tuples
         face_encodings_in_frame = face_recognition.face_encodings(rgb_frame, face_loacations_in_frame)  #finding face encodings at identified locations -->returns list of arrays(an array of 128 values)
-        # for (top, right, left, bottom), face_encodings_of_frame in zip(face_loacations_in_frame,face_encodings_in_frame):
-        for face_encodings_of_frame in face_encodings_in_frame:
+        for (top, right, left, bottom), face_encodings_of_frame in zip(face_loacations_in_frame,face_encodings_in_frame):
+        # for face_encodings_of_frame in face_encodings_in_frame:
             threshold = 0.4
             matched = face_recognition.compare_faces(encodings_n18, face_encodings_of_frame,threshold)  #comparing encodings of webcam with saved MongoDB data. It gives index of recognized images
             name = "Stranger"
             if True in matched:
                 recognized_images.append('N'+str(180001+matched.index(True)))   #appending identified images
                 name = recognized_images[0]
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (0, 0, 0),2)
+                cv2.putText(frame, name, (left+3,bottom-3), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (255,0,0),2)
                 var = True
                 break
             else:
                 # cv2.rectangle(frame, (left, top), (right, bottom), (255, 0, 0), 2)    #to draw rectangle over detected face
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(0, 0, 0), 2)  #showing name at position 50 px down from top and 50px right from left end
+                cv2.putText(frame, name, (left+3,bottom-3), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(255,0,0), 2)  #showing name at position 50 px down from top and 50px right from left end
         cv2.imshow("RECOGNIZING", frame)
         if cv2.waitKey(1) == 32:    # waitkey returns ASCII value of pressed key and also wait for 1 millisecond for input i.e., to stop showing videocapturing when user clicked on "space bar"(32 is ASCII value of space bar)
             break
@@ -161,19 +165,19 @@ def recognizing_faces():
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         face_loacations_in_frame = face_recognition.face_locations(rgb_frame)
         face_encodings_in_frame = face_recognition.face_encodings(rgb_frame, face_loacations_in_frame)
-        # for (top, right, left, bottom), face_encodings_of_frame in zip(face_loacations_in_frame,face_encodings_in_frame):
-        for face_encodings_of_frame in face_encodings_in_frame:
+        for (top, right, left, bottom), face_encodings_of_frame in zip(face_loacations_in_frame,face_encodings_in_frame):
+        # for face_encodings_of_frame in face_encodings_in_frame:
             threshold=0.4
             matched = face_recognition.compare_faces(encodings_n18, face_encodings_of_frame,threshold)
             name = "Stranger"
             if True in matched:
                 IDs_matched = ['N'+str(id+i) for i, match in enumerate(matched) if match]
                 for i in IDs_matched:
-                    cv2.putText(frame, i, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (0, 0, 0),2)
+                    cv2.putText(frame, i, (left+3, bottom-3), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5, (255,0,0),2)
                     if i not in recognized_images:
                         recognized_images.append(i)
             else:
-                cv2.putText(frame, name, (50, 50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(0, 0, 0), 2)
+                cv2.putText(frame, name, (left+3,bottom-3), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1.5,(255,0,0), 2)
         cv2.imshow("RECOGNIZING", frame)
         if cv2.waitKey(1) == 32:
             break
@@ -189,6 +193,7 @@ def time_out():
     set_window_position(top_level_4)
     top_level_4.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_4))
     top_level_4.title("NONE")
+
     CTkLabel(top_level_4,text="No one recognized").pack(padx=40,pady=20)
     CTkButton(top_level_4,text="Retry",command=time_out_result).pack(padx=40)
     CTkButton(top_level_4, text="Exit", command=sys.exit).pack(pady=20)
@@ -203,7 +208,7 @@ def direct_login(id, passwd):
         browser = webdriver.Chrome(options=options)
         browser.maximize_window()
         browser.get("https://intranet.rguktn.ac.in/SMS/")  # opening browser to this url
-        browser.implicitly_wait(10)  # maximum time to wait to identify each element in browser
+        browser.implicitly_wait(30)  # maximum time to wait to identify each element in browser
         user_name = browser.find_element(by="id", value="user1")  # finding elements
         password = browser.find_element(by="id", value="passwd1")
         user_name.send_keys(id)  # sending keys
@@ -253,17 +258,31 @@ def retry():
 #function to verify random_top generated and user inputted otp
 def enter_otp(id,random_otp):
     def verify_otp_result():
-        if otp_data.get() == str(random_otp):
-            top_level_6.destroy()
+        top_level_6.destroy()
+        if otp_data_var.get() == str(random_otp):
+            print("verify_otp_result")
             fetch(id)
         else:
-            tkinter.messagebox.showerror('Invalid','Invalid OTP')
+            # tkinter.messagebox.showerror('Invalid','Invalid OTP')
+            def re_enter_result():
+                top_level_10.destroy()
+                enter_otp(id, random_otp)
+            top_level_10 = CTkToplevel()
+            set_window_position(top_level_10)
+            top_level_10.title("Incorrect")
+            top_level_10.protocol("WM_DELETE_WINDOW",lambda : exit_program(top_level_10))
+            CTkLabel(top_level_10, text="Incorrect OTP entered").pack(pady=20)
+            verify_otp = CTkButton(top_level_10, text='RE-ENTER', command= re_enter_result).pack(padx=60)
+            CTkButton(top_level_10, text='EXIT', command=sys.exit).pack(pady=20)
+
+
     top_level_6 = CTkToplevel()
     set_window_position(top_level_6)
     top_level_6.protocol("WM_DELETE_WINDOW", lambda : exit_program(top_level_6))
     top_level_6.title("VERIFY")
-    otp_info = CTkLabel(top_level_6, text='\nEnter OTP sent to mail for confirmation of your login').pack(padx=20)
-    otp_data = CTkEntry(top_level_6, placeholder_text='Enter OTP').pack(padx=40,pady=20)
+    otp_info = CTkLabel(top_level_6, text=f'\nEnter OTP sent to mail({id}) for confirmation of login').pack(padx=20)
+    otp_data_var = StringVar()
+    otp_data = CTkEntry(top_level_6, textvariable=otp_data_var).pack(padx=40,pady=20)
     ok_otp = CTkButton(top_level_6, text='VERIFY', command=verify_otp_result).pack(padx=40)
     CTkButton(top_level_6, text='EXIT', command=sys.exit).pack(padx=40,pady=20)
     top_level_6.mainloop()
@@ -318,18 +337,17 @@ def show_option_to_login(recognized_images):
 #     def check_0_result_1():
 #         top_level_3.destroy()
 #         fetch(id)
-    # def check_0_result_2():
-    #     top_level_3.destroy()
-    #     recognized_images.clear()
-    #     recognizing_one_face()
-    # top_level_3 = CTkToplevel()
-    # set_window_position(top_level_3)
-    # top_level_3.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_3))
-    # top_level_3.title("RECOGNIZED")
-    # CTkButton(top_level_3,text="Log_to_"+id,command=check_0_result_1).pack(pady=20,padx=60)
-    # CTkButton(top_level_3, text="Retry", command=check_0_result_2).pack()
-    # CTkButton(top_level_3, text="exit_program", command=sys.exit).pack(pady=20)
-    # top_level_3.mainloop()
+#     def check_0_result_2():
+#         top_level_3.destroy()
+#         recognized_images.clear()
+#         recognizing_one_face()
+#     top_level_3 = CTkToplevel()
+#     top_level_3.protocol("WM_DELETE_WINDOW", lambda: exit_program(top_level_3))
+#     top_level_3.title("RECOGNIZED")
+#     CTkButton(top_level_3,text="Log_to_"+id,command=check_0_result_1).pack(pady=20,padx=60)
+#     CTkButton(top_level_3, text="Retry", command=check_0_result_2).pack()
+#     CTkButton(top_level_3, text="exit_program", command=sys.exit).pack(pady=20)
+#     top_level_3.mainloop()
 def decrypt_password(encrypted_password):
     password = fernet.decrypt(encrypted_password).decode()      #decrypt password
     return password
@@ -350,19 +368,22 @@ def check_1():
         retry()
 
 if __name__  == '__main__':
+    # enter_otp("N180109",1818)
     def mongo_connection():
         try:
             # #for localhost connection to fetch data stored in local mongodb
             # client = MongoClient("mongodb://localhost:27017")
             # db = client["sms_login_details"]
+            # global collection
             # collection = db["sms_login_details_n18"]
+
             # making MongoDB atlas connection to fetch data stored in atlas for face recognition
             mongo_atlas = MongoClient("mongodb+srv://mini_project:2018_batch@cluster0.8dutogq.mongodb.net/")
             db = mongo_atlas["sms_login_details"]
             global collection
             collection = db["sms_login_details_n18"]
             n18_encodings = collection.find({}, {"_id": 0, "face_encoding": 1})  # Assume as it returns a list of dictionaries which only has 'face_encoding' as a key and it's encoding as a value. But in general n18_encodings is a cursor object which has dictionaries of our face encodings
-            global  encodings_n18
+            global encodings_n18
             encodings_n18 = [i['face_encoding'] for i in n18_encodings]  # It only has encodings stored in a list
         except:
             top_level_9 = CTkToplevel()
@@ -379,3 +400,5 @@ if __name__  == '__main__':
         else:
             which_login()
     mongo_connection()
+
+
