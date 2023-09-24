@@ -1,5 +1,8 @@
 # mini_project-E3
 
+In our college RGUKT - Nuzvid, we have SMS(Student Management System). This SMS is like an online notice board to the students, where faculty can post anything related to students. For this we have password-based
+login system, which is not secure as we can get passwords from the exam files. So to make it secure, I am here with the face-recognition based login system.
+
 Here's the proposed method
 
 I proposed a face recognition-based login system for our SMS to ensure security and to reduce human effort for manual entry of details at the login page. This system just tries to 
